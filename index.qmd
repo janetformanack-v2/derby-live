@@ -81,7 +81,7 @@ sliderInput(
   "points1", 
   "Points (Team 1):", 
   min = 0, 
-  max = 40, 
+  max = 24, 
   value = 0
 )
 ```
@@ -107,7 +107,7 @@ sliderInput(
   "points2", 
   "Points (Team 2):", 
   min = 0, 
-  max = 40, 
+  max = 24, 
   value = 0
 )
 ```
@@ -124,7 +124,7 @@ actionButton(
 ```
 
 
-# Plot
+# Scoreboard
 
 ```{r}
 plotOutput("plot")
@@ -171,50 +171,76 @@ output$data_saved <- renderTable({
 })
 
 output$plot <- renderPlot({
- p <- data$df |> 
+  
+  tidy_dat <- data$df |> 
+     mutate(
+       jam_number = row_number()
+     ) |> 
+     select(
+       jam_number,
+       points1,
+       points2
+     ) |> 
+     tidyr::pivot_longer(
+       cols = c(points1, points2),
+       names_to = "team",
+       values_to = "points"
+     ) |> 
+     mutate(
+       team = stringr::str_replace(team, "points", "Team ")
+     ) |> 
+    group_by(
+      team
+    ) |> 
     mutate(
-      jam_number = row_number()
+      cum_points = cumsum(points)
     ) |> 
-    select(
-      jam_number,
-      points1,
-      points2
+    ungroup()
+  
+  # current scores
+  scores_now = tidy_dat |> 
+    group_by(team) |> 
+    reframe(
+      points = max(cum_points)
     ) |> 
-    tidyr::pivot_longer(
-      cols = c(points1, points2),
-      names_to = "team",
-      values_to = "points"
-    ) |> 
-    mutate(
-      team = stringr::str_replace(team, "points", "Team ")
-    ) |> 
-   group_by(
-     team
-   ) |> 
-   mutate(
-     cum_points = cumsum(points)
-   ) |> 
+    pull(points)
+  
+  p <- tidy_dat |> 
+    # mutate(
+    #   jam_number = factor(jam_number)
+    # ) |> 
     ggplot(
       aes(
         x = jam_number,
         y = cum_points,
         color = team,
-        group = team
+        group = team,
+        fill = team
       )
     ) +
-    geom_line(linewidth = 1.5) +
+    geom_line(linewidth = 2) +
     geom_point(
       shape = 21,
       col = "black",
-      size = 3
+      size = 4
     ) +
     labs(
       x = "Jam Number",
       y = "Score",
-      title = "",
+      title = glue::glue(
+        "Team 1: {scores_now[1]}\n\nTeam 2: {scores_now[2]}"
+      ),
       subtitle = ""
     ) +
-    theme_minimal(20)
+    scale_y_continuous(
+      limits = c(0, max(scores_now) + 10),
+      n.breaks = 5
+    ) +
+    scale_x_continuous(
+      breaks = scales::breaks_pretty(),
+      n.breaks = 5
+    ) +
+    theme_minimal(30)
   
   print(p)
 })
