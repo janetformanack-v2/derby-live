@@ -1,3 +1,6 @@
+*.html
+index_*/
+
 # History files
 .Rhistory
 .Rapp.history
