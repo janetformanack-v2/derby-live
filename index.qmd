@@ -1,0 +1,223 @@
+---
+title: "Derby (LIVE)"
+author: "by Beep Boop"
+format: dashboard
+server: shiny
+---
+
+```{r}
+#| context: setup
+library(ggplot2)
+library(shiny)
+library(dplyr)
+
+# # custom functions
+# source(here::here("./functions/read_s3.R"))
+# source(here::here("./functions/plot_algo.R"))
+# source(here::here("./functions/re_tally.R"))
+# source(here::here("./functions/label_event.R"))
+# # # for debug purpose, comment out in production
+# setup_env <- environment()
+```
+
+```{r get_data}
+roster <- tibble::tibble(
+  team1 = c("00", "911", "24", "323", "123", "314", "81"),
+  team2 = c("11", "12", "13", "14", "15", "16", "17")
+)
+```
+
+
+```{r}
+#| context: data
+
+# get team information
+team1 <- roster |> pull(team1)
+team2 <- roster |> pull(team2)
+
+# Initialize reactiveValues to store the data
+data <- reactiveValues(
+  df = data.frame(
+    jammer1   = character(),
+    blockers1 = character(),
+    points1   = integer(),
+    jammer2   = character(),
+    blockers2 = character(),
+    points2   = integer(),
+    stringsAsFactors = FALSE
+  )
+)
+```
+
+# {.sidebar}
+
+```{r}
+actionButton(
+  "clear", 
+  "Clear last saved row.",
+  style="background-color: orange"
+)
+```
+
+
+#### Team 1
+
+```{r}
+selectInput(
+  "jammer1", 
+  "Select Jammer (Team 1)", 
+  choices = team1,
+  multiple = FALSE
+)
+
+selectInput(
+  "blockers1",
+  "Select blockers (Team 1)",
+  choices = team1,
+  multiple = TRUE
+)
+
+sliderInput(
+  "points1", 
+  "Points (Team 1):", 
+  min = 0, 
+  max = 40, 
+  value = 0
+)
+```
+
+#### Team 2
+
+```{r}
+selectInput(
+  "jammer2", 
+  "Select Jammer (Team 2)", 
+  choices = team2,
+  multiple = FALSE
+)
+
+selectInput(
+  "blockers2",
+  "Select blockers (Team 2)",
+  choices = team2,
+  multiple = TRUE
+)
+
+sliderInput(
+  "points2", 
+  "Points (Team 2):", 
+  min = 0, 
+  max = 40, 
+  value = 0
+)
+```
+
+```{r}
+actionButton(
+  "save", 
+  "Save data.", 
+  icon("paper-plane"), 
+  style="color: #fff; 
+  background-color: #337ab7; 
+  border-color: #2e6da4"
+)
+```
+
+
+# Plot
+
+```{r}
+plotOutput("plot")
+```
+
+
+# Data
+
+```{r}
+div(tableOutput("data_saved"), style = "font-size:80%")
+```
+
+
+```{r}
+#| context: server
+
+observeEvent(input$save, {
+  # Save data to the reactive data frame
+  new_row <- data.frame(
+    jammer1   = input$jammer1,
+    jammer2   = input$jammer2,
+    blockers1 = paste(input$blockers1, collapse = ", "),
+    blockers2 = paste(input$blockers2, collapse = ", "),
+    points1   = input$points1,
+    points2   = input$points2,
+    stringsAsFactors = FALSE
+  )
+  data$df <- bind_rows(data$df, new_row)
+})
+
+observeEvent(input$clear, {
+  # Clear only the last saved row
+  if (nrow(data$df) > 0) {
+    data$df <- data$df[-nrow(data$df), ]
+  }
+})
+
+output$data_saved <- renderTable({
+  data$df |> 
+    mutate(
+      jam_number = row_number(),
+      .before = 1
+    )
+})
+
+output$plot <- renderPlot({
+ p <- data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      points1,
+      points2
+    ) |> 
+    tidyr::pivot_longer(
+      cols = c(points1, points2),
+      names_to = "team",
+      values_to = "points"
+    ) |> 
+    mutate(
+      team = stringr::str_replace(team, "points", "Team ")
+    ) |> 
+   group_by(
+     team
+   ) |> 
+   mutate(
+     cum_points = cumsum(points)
+   ) |> 
+    ggplot(
+      aes(
+        x = jam_number,
+        y = cum_points,
+        color = team,
+        group = team
+      )
+    ) +
+    geom_line(linewidth = 1.5) +
+    geom_point(
+      shape = 21,
+      col = "black",
+      size = 3
+    ) +
+    labs(
+      x = "Jam Number",
+      y = "Score",
+      title = "",
+      subtitle = ""
+    ) +
+    theme_minimal(20)
+  
+  print(p)
+})
+
+```
+
