@@ -49,44 +49,38 @@ data <- reactiveValues(
 )
 ```
 
-# {.sidebar}
+## {.sidebar}
 
 ```{r}
-actionButton(
-  "clear", 
-  "Clear last saved row.",
-  style="background-color: orange"
+selectInput(
+  "lead",
+  "LEAD?",
+  choices = c("Team 1", "Team 2", "none"),
+  selected = "none",
+  multiple = FALSE
 )
 ```
 
 
-#### Team 1
+### Team 1
 
-```{r}
+```{r size=10}
 selectInput(
   "jammer1", 
   "Select Jammer (Team 1)", 
   choices = team1,
   multiple = FALSE
 )
-
-selectInput(
+checkboxGroupInput(
   "blockers1",
   "Select blockers (Team 1)",
   choices = team1,
-  multiple = TRUE
-)
-
-sliderInput(
-  "points1", 
-  "Points (Team 1):", 
-  min = 0, 
-  max = 24, 
-  value = 0
+  # multiple = TRUE
+  inline = TRUE
 )
 ```
 
-#### Team 2
+### Team 2
 
 ```{r}
 selectInput(
@@ -95,24 +89,43 @@ selectInput(
   choices = team2,
   multiple = FALSE
 )
-
-selectInput(
+checkboxGroupInput(
   "blockers2",
   "Select blockers (Team 2)",
   choices = team2,
-  multiple = TRUE
+  # multiple = TRUE
+  inline = TRUE
+)
+
+```
+
+# {.toolbar}
+
+```{r}
+
+sliderInput(
+  "points1", 
+  "Points (Team 1):", 
+  min = 0, 
+  max = 4, 
+  value = 0
 )
 
 sliderInput(
   "points2", 
   "Points (Team 2):", 
   min = 0, 
-  max = 24, 
+  max = 4, 
   value = 0
 )
-```
 
-```{r}
+checkboxGroupInput(
+  "jammer_penalty",
+  "Jammer PENALTY?",
+  choices = c("Team 1", "Team 2", "both"),
+  inline = TRUE
+)
+
 actionButton(
   "save", 
   "Save data.", 
@@ -121,8 +134,17 @@ actionButton(
   background-color: #337ab7; 
   border-color: #2e6da4"
 )
-```
 
+actionButton(
+  "clear", 
+  "Clear last entry", 
+  icon("paper-plane"), 
+  style="color: #fff; 
+  background-color: orange; 
+  border-color: #2e6da4"
+)
+
+```
 
 # Scoreboard
 
@@ -130,11 +152,10 @@ actionButton(
 plotOutput("plot")
 ```
 
-
 # Data
 
 ```{r}
-div(tableOutput("data_saved"), style = "font-size:80%")
+div(tableOutput("data_saved"), style = "font-size:40%")
 ```
 
 
@@ -165,30 +186,64 @@ observeEvent(input$clear, {
 output$data_saved <- renderTable({
   data$df |> 
     mutate(
-      jam_number = row_number(),
-      .before = 1
+      # now = Sys.time() |> lubridate::as_datetime(),
+      # entry_number = row_number(),
+      # .before = 1
+    ) |>
+    group_by(
+      jammer1,
+      jammer2,
+      blockers1,
+      blockers2
+    ) |> 
+    reframe(
+      points1 = sum(points1, na.rm = TRUE),
+      points2 = sum(points2, na.rm = TRUE)
+    ) |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      matches("^points"),
+      matches("1$"),
+      everything()
     )
 })
 
 output$plot <- renderPlot({
   
   tidy_dat <- data$df |> 
-     mutate(
-       jam_number = row_number()
-     ) |> 
-     select(
-       jam_number,
-       points1,
-       points2
-     ) |> 
-     tidyr::pivot_longer(
-       cols = c(points1, points2),
-       names_to = "team",
-       values_to = "points"
-     ) |> 
-     mutate(
-       team = stringr::str_replace(team, "points", "Team ")
-     ) |> 
+    mutate(
+      jam_number = row_number()
+     ) |>
+    group_by(
+      jammer1,
+      jammer2,
+      blockers1,
+      blockers2
+    ) |> 
+    reframe(
+      # jam_number = row_number(),
+      points1 = sum(points1, na.rm = TRUE),
+      points2 = sum(points2, na.rm = TRUE)
+    ) |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      points1,
+      points2
+    ) |> 
+    tidyr::pivot_longer(
+      cols = c(points1, points2),
+      names_to = "team",
+      values_to = "points"
+    ) |> 
+    mutate(
+      team = stringr::str_replace(team, "points", "Team ")
+    ) |> 
     group_by(
       team
     ) |> 
@@ -225,12 +280,12 @@ output$plot <- renderPlot({
       size = 4
     ) +
     labs(
-      x = "Jam Number",
+      x = "Jam",
       y = "Score",
-      title = glue::glue(
-        "Team 1: {scores_now[1]}\n\nTeam 2: {scores_now[2]}"
-      ),
-      subtitle = ""
+      subtitle = glue::glue(
+        "Team 1 score: {scores_now[1]}\n
+        Team 2 score: {scores_now[2]}"
+      )
     ) +
     scale_y_continuous(
       limits = c(0, max(scores_now) + 10),
@@ -240,7 +295,10 @@ output$plot <- renderPlot({
       breaks = scales::breaks_pretty(),
       n.breaks = 5
     ) +
-    theme_minimal(30)
+    theme_minimal(20) +
+    theme(
+      legend.position = "top"
+    )
   
   print(p)
 })
