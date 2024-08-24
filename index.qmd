@@ -4,6 +4,7 @@ author: "by Beep Boop"
 format: 
   dashboard:
     theme: pulse
+    self-contained: true
 server: shiny
 ---
 
