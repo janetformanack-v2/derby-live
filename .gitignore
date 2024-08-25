@@ -1,4 +1,6 @@
-*.html
+**/.DS_Store
+index_data/*RData
+dev/*
 index_*/
 
 # History files
