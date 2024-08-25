@@ -1,6 +1,6 @@
 ---
 title: "Derby"
-author: "(LIVE)"
+author: "( LIVE )"
 format: 
   dashboard:
     theme: pulse
@@ -101,13 +101,8 @@ library(ggplot2)
 library(shiny)
 library(dplyr)
 
-# # custom functions
-# source(here::here("./functions/read_s3.R"))
-# source(here::here("./functions/plot_algo.R"))
-# source(here::here("./functions/re_tally.R"))
-# source(here::here("./functions/label_event.R"))
-# # # for debug purpose, comment out in production
-# setup_env <- environment()
+for (i in list.files("R", full.names = TRUE)) source(i)
+
 ```
 
 ```{r get_data}
@@ -169,6 +164,9 @@ data <- reactiveValues(
     jammer2   = character(),
     blockers2 = character(),
     points2   = integer(),
+    # jammer thingy
+    lead = character(),
+    jammer_penalty = character(),
     stringsAsFactors = FALSE
   )
 )
@@ -314,7 +312,7 @@ tags$div(
 
 ```{r}
 #| content: valuebox
-#| title: "Starlets"
+#| title: "HARD"
 #| color: "primary"
 shinydashboard::valueBoxOutput("valueBox1")
 ```
@@ -329,8 +327,21 @@ shinydashboard::valueBoxOutput("valueBox2")
 ## Column
 
 ```{r}
-plotOutput("plot")
+plotOutput("scoreboard")
 ```
+
+# Jammer (HARD)
+
+```{r}
+plotOutput("jammer_points1")
+```
+
+# Jammer (Oppo)
+
+```{r}
+plotOutput("jammer_points2")
+```
+
 
 # Data
 
@@ -371,6 +382,9 @@ observeEvent(input$save, {
     blockers2 = paste(input$blockers2, collapse = ", "),
     points1   = as.integer(input$points1),
     points2   = as.integer(input$points2),
+    # jammer things
+    lead = as.character(input$lead),
+    jammer_penalty = as.character(input$jammer_penalty),
     stringsAsFactors = FALSE
   )
   data$df <- bind_rows(data$df, new_row)
@@ -386,7 +400,7 @@ observeEvent(input$clear, {
 observeEvent(input$resetapp, {
   shinyalert::shinyalert(
     title = "Confirm App Reset",
-    text = "Are you sure you want to reset the app and clear all saved data?",
+    text = "Reset the app and clear all saved data ?",
     type = "warning",
     showCancelButton = TRUE,
     confirmButtonText = "Yes, Reset",
@@ -406,13 +420,15 @@ output$data_saved <- renderTable({
     ) |> 
     select(
       jam_number,
+      lead,
       matches("^points"),
       matches("1$"),
       everything()
     )
 })
 
-tidy_dat <- reactive({
+## TRANSFORM (scoreboard) ----
+tidy_scoreboard <- reactive({
   data$df |> 
     mutate(
       jam_number = row_number()
@@ -442,11 +458,11 @@ tidy_dat <- reactive({
     ) |> 
     ungroup()
 })
-  
-# current scores
+
+## get current scores ----
 scores_now = reactive({
-  if (nrow(tidy_dat()) > 0) {
-    tidy_dat() |> 
+  if (nrow(tidy_scoreboard()) > 0) {
+    tidy_scoreboard() |> 
       group_by(team) |> 
       reframe(
         points = max(cum_points)
@@ -456,7 +472,7 @@ scores_now = reactive({
     c(0, 0)
   }
 })
-
+## generate scoreboard (1) ----
 output$valueBox1 <- shinydashboard::renderValueBox({
   shinydashboard::valueBox(
     subtitle = tags$p(
@@ -471,7 +487,7 @@ output$valueBox1 <- shinydashboard::renderValueBox({
     )
   )
 })
-
+## generate scoreboard (2) ----
 output$valueBox2 <- shinydashboard::renderValueBox({
   shinydashboard::valueBox(
     subtitle = tags$p(
@@ -486,10 +502,9 @@ output$valueBox2 <- shinydashboard::renderValueBox({
     )
   )
 })
-  
-
-output$plot <- renderPlot({
-  p <- tidy_dat() |> 
+## display scoreboard (worm plot) ----
+output$scoreboard <- renderPlot({
+  p <- tidy_scoreboard() |> 
     # mutate(
     #   jam_number = factor(jam_number)
     # ) |> 
@@ -537,6 +552,184 @@ output$plot <- renderPlot({
   
   print(p)
 })
+
+# JAMMER STATS (HARD) ----
+tidy_individual1 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      jammer1,
+      lead,
+      points1
+    ) |> 
+    group_by(
+      jammer1
+    ) |> 
+    reframe(
+      n_jams = n(),
+      which_jams = list(jam_number),
+      n_jams_lead = sum(lead == team1),
+      n_points_list = list(points1),
+      n_points_sum = sum(points1)
+    ) |> 
+    mutate(
+      team = team1,
+      n_points_jam = round(n_points_sum / n_jams, 0)
+    ) |> 
+    rename(
+      jammer = jammer1
+    )
+})
+
+# INDIVIDUAL STATS (Oppo) ----
+tidy_individual2 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      jammer2,
+      lead,
+      points2
+    ) |> 
+    group_by(
+      jammer2
+    ) |> 
+    reframe(
+      n_jams = n(),
+      which_jams = list(jam_number),
+      n_jams_lead = sum(lead == team2),
+      n_points_list = list(points2),
+      n_points_sum = sum(points2)
+    ) |> 
+    mutate(
+      team = team2,
+      n_points_jam = round(n_points_sum / n_jams, 0)
+    ) |> 
+    rename(
+      jammer = jammer2
+    )
+    
+})
+
+# jammer points (hard)
+output$jammer_points1 <- renderPlot({
+  p1 <- tidy_individual1() |> 
+    select(
+      team,
+      jammer,
+      n_jams,
+      n_jams_lead,
+      n_points_sum,
+      n_points_jam
+    ) |> 
+    tidyr::pivot_longer(
+      cols = matches("^n_"),
+      names_to = "what",
+      values_to = "value"
+    ) |> 
+    mutate(
+      what = factor(
+        what,
+        levels = c(
+          "n_jams",
+          "n_jams_lead",
+          "n_points_sum",
+          "n_points_jam"
+        )
+      )
+    ) |> 
+    plot_jammer_stats()
+    
+  print(p1)
+})
+
+
+# jammer points (Oppo)
+output$jammer_points2 <- renderPlot({
+  p2 <- tidy_individual2() |> 
+    select(
+      team,
+      jammer,
+      n_jams,
+      n_jams_lead,
+      n_points_sum,
+      n_points_jam
+    ) |> 
+    tidyr::pivot_longer(
+      cols = matches("^n_"),
+      names_to = "what",
+      values_to = "value"
+    ) |> 
+    mutate(
+      what = factor(
+        what,
+        levels = c(
+          "n_jams",
+          "n_jams_lead",
+          "n_points_sum",
+          "n_points_jam"
+        )
+      )
+    ) |> 
+    ggplot(
+      aes(
+        x = value,
+        y = jammer,
+        color = team,
+        fill = team
+      )
+    ) +
+    facet_wrap(
+      ~ what,
+      ncol = 2,
+      nrow = 2
+      # scales = "free_x"
+    ) +
+    geom_bar(
+      stat = "identity"
+    ) +
+    geom_point(
+      shape = 21,
+      col = "white",
+      size = 7,
+      alpha = 0.7,
+      stroke = 2
+    ) +
+    labs(
+      title = "",
+      x = "",
+      y = ""
+    ) +
+    # scale_y_continuous(
+    #   limits = c(0, max(scores_now()) + 10),
+    #   breaks = scales::breaks_pretty()
+    # ) +
+    scale_x_continuous(
+      breaks = scales::breaks_pretty()
+    ) +
+    theme_bw(24) +
+    scale_fill_manual(
+      values = c("grey10")
+    ) +
+    scale_color_manual(
+      values = c("grey10")
+    ) +
+    theme(
+      legend.position = "none",
+      legend.title = element_blank()
+    )
+    
+  print(p2)
+})
+
+
+## Blocker stats
+
 
 ```
 
