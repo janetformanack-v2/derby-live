@@ -6719,6 +6719,9 @@ for (i in list.files("R", full.names = TRUE)) source(i)
 team1 <- "hard"
 team2 <- setdiff(team_names, team1)
 
+# Specify team colors
+team_colors <- c("#B22EF0", "grey10")
+
 # Get names and numbers of players
 players1 <- roster |> filter(team == team1) |> pull(player_number)
 players2 <- roster |> filter(team == team2) |> pull(player_number)
@@ -6788,7 +6791,7 @@ observeEvent(input$clear, {
 observeEvent(input$resetapp, {
   shinyalert::shinyalert(
     title = "Confirm App Reset",
-    text = "Are you sure you want to reset the app and clear all saved data?",
+    text = "Reset the app and clear all saved data ?",
     type = "warning",
     showCancelButton = TRUE,
     confirmButtonText = "Yes, Reset",
@@ -6893,50 +6896,7 @@ output$valueBox2 <- shinydashboard::renderValueBox({
 ## display scoreboard (worm plot) ----
 output$scoreboard <- renderPlot({
   p <- tidy_scoreboard() |> 
-    # mutate(
-    #   jam_number = factor(jam_number)
-    # ) |> 
-    ggplot(
-      aes(
-        x = jam_number,
-        y = cum_points,
-        color = team,
-        fill = team
-      )
-    ) +
-    geom_line(
-      linewidth = 3,
-      alpha = 0.8
-    ) +
-    geom_point(
-      shape = 21,
-      col = "white",
-      size = 5,
-      alpha = 0.7,
-      stroke = 2
-    ) +
-    labs(
-      x = "Jam Number",
-      y = ""
-    ) +
-    scale_y_continuous(
-      limits = c(0, max(scores_now()) + 10),
-      breaks = scales::breaks_pretty()
-    ) +
-    scale_x_continuous(
-      breaks = scales::breaks_pretty()
-    ) +
-    theme_minimal(24) +
-    scale_fill_manual(
-      values = c("#B22EF0", "grey10")
-    ) +
-    scale_color_manual(
-      values = c("#B22EF0", "grey10")
-    ) +
-    theme(
-      legend.position = "none",
-      legend.title = element_blank()
-    )
+    plot_scoreboard()
   
   print(p)
 })
@@ -7031,7 +6991,9 @@ output$jammer_points1 <- renderPlot({
         )
       )
     ) |> 
-    plot_jammer_stats()
+    plot_jammer_stats(
+      team_color = team_colors[1]
+    )
     
   print(p1)
 })
@@ -7064,52 +7026,8 @@ output$jammer_points2 <- renderPlot({
         )
       )
     ) |> 
-    ggplot(
-      aes(
-        x = value,
-        y = jammer,
-        color = team,
-        fill = team
-      )
-    ) +
-    facet_wrap(
-      ~ what,
-      ncol = 2,
-      nrow = 2
-      # scales = "free_x"
-    ) +
-    geom_bar(
-      stat = "identity"
-    ) +
-    geom_point(
-      shape = 21,
-      col = "white",
-      size = 7,
-      alpha = 0.7,
-      stroke = 2
-    ) +
-    labs(
-      title = "",
-      x = "",
-      y = ""
-    ) +
-    # scale_y_continuous(
-    #   limits = c(0, max(scores_now()) + 10),
-    #   breaks = scales::breaks_pretty()
-    # ) +
-    scale_x_continuous(
-      breaks = scales::breaks_pretty()
-    ) +
-    theme_bw(24) +
-    scale_fill_manual(
-      values = c("grey10")
-    ) +
-    scale_color_manual(
-      values = c("grey10")
-    ) +
-    theme(
-      legend.position = "none",
-      legend.title = element_blank()
+    plot_jammer_stats(
+      team_color = team_colors[2]
     )
     
   print(p2)

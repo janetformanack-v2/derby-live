@@ -1,4 +1,4 @@
-plot_jammer_stats <- function(data) {
+plot_jammer_stats <- function(data, team_color) {
   data |> 
     ggplot(
       aes(
@@ -11,8 +11,8 @@ plot_jammer_stats <- function(data) {
     facet_wrap(
       ~ what,
       ncol = 2,
-      nrow = 2
-      # scales = "free_x"
+      nrow = 2,
+      scales = "free_x"
     ) +
     geom_bar(
       stat = "identity"
@@ -38,10 +38,12 @@ plot_jammer_stats <- function(data) {
     ) +
     theme_bw(24) +
     scale_fill_manual(
-      values = c("#B22EF0", "grey10")
+      # values = c("#B22EF0", "grey10")
+      values = team_color
     ) +
     scale_color_manual(
-      values = c("#B22EF0", "grey10")
+      values = team_color
+      # values = c("#B22EF0", "grey10")
     ) +
     theme(
       legend.position = "none",
