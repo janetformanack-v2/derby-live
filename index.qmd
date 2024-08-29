@@ -36,19 +36,40 @@ body, h1, h2, h3, h4, h5, h6, p {
 <!--   width: 500px !important; -->
 <!-- } -->
 
+.dashboard-page {
+  width: 100%;
+  margin-left: 0;
+}
+
 .toolbar {
   background-color: #A2C5C9 !important;
   color: black;
-  font-size: 24px !important;
-  width: 100% !important;
+  font-size: 16px; 
+  width: 100%;
   display: flex;
   flex-direction: column;
-  grid-template-columns: 1fr 2fr;
-  margin-top: 2px !important;
-  padding: 10px !important;
+  margin-top: 2px;
+  padding: 10px; 
   box-sizing: border-box;
-  justify-content: space-between !important;
-  align-items: stretch !important;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+
+@media (min-width: 768px) {
+
+  .dashboard-page {
+    width: 130% !important;
+    margin-left: -150px;
+  }
+
+  .toolbar {
+    background-color: #A2C5C9 !important;
+    color: black;
+    font-size: 24px !important;
+    width: 70% !important;
+    padding: 30px !important;
+  }
 }
 
 .toolbar-header {
@@ -93,10 +114,14 @@ body, h1, h2, h3, h4, h5, h6, p {
 }
 
 .radio {
-  margin-bottom: -10px !important;
-  }
+  font-size: 20px !important;
+  margin-bottom: -20px !important;
+  margin-top: 0;
+}
+
 .shiny-plot-output {
-  margin-top: -10px !important;
+  margin-top: -15px !important;
+  margin-bottom: -10px !important
 }
 
 </style>
@@ -159,7 +184,7 @@ team1 <- "hard"
 team2 <- setdiff(team_names, team1)
 
 # Specify team colors
-team_colors <- c("#B22EF0", "grey10")
+team_colors <- c("#622773", "grey10")
 
 # Get names and numbers of players
 # team1: hard
@@ -222,6 +247,7 @@ checkboxGroupInput(
   "blockers1",
   glue::glue("Select Blockers ({team1})"),
   choices = players1,
+  selected = players1,
   inline = TRUE
 )
 
@@ -240,20 +266,21 @@ checkboxGroupInput(
   "blockers2",
   glue::glue("Select Blockers ({team2})"),
   choices = players2,
+  selected = players2,
   inline = TRUE
 )
 
-actionButton(
-  "resetapp", 
-  "Reset App", 
-  icon("refresh"), 
-  style="
-    color: #fff; 
-    background-color: #C13C37; 
-    border-color: red; 
-    width: 100%;
-  "
-)
+# actionButton(
+#   "resetapp", 
+#   "Reset App", 
+#   icon("refresh"), 
+#   style="
+#     color: #fff; 
+#     background-color: #C13C37; 
+#     border-color: red; 
+#     width: 100%;
+#   "
+# )
 ```
 
 # {.toolbar}
@@ -326,13 +353,13 @@ tags$div(
     ),
     
     actionButton(
-      "default", 
-      "Reset defaults", 
-      icon("reset"), 
+      "default",
+      "Reset defaults",
+      icon("refresh"),
       style="
-        color: #fff; 
-        background-color: green; 
-        border-color: #2e6da4; 
+        color: #fff;
+        background-color: green;
+        border-color: #2e6da4;
         width: 100%;
       "
     ),
@@ -382,29 +409,47 @@ plotOutput("scoreboard")
 ```{r}
 # Radio buttons to toggle between plots
 radioButtons(
-  "plot_choice", 
+  "plot_choice1", 
   "",
   choices = c(
-    "HARD"       = "jammer_points1",
-    "Opponent"   = "jammer_points2"
+    "HARD",
+    "Opponent"
   ),
   inline = TRUE
 )
 # Conditional panels to display the chosen plot
 conditionalPanel(
-  condition = "input.plot_choice == 'jammer_points1'",
+  condition = "input.plot_choice1 == 'HARD'",
   plotOutput("jammer_points1")
 )
 conditionalPanel(
-  condition = "input.plot_choice == 'jammer_points2'",
+  condition = "input.plot_choice1 == 'Opponent'",
   plotOutput("jammer_points2")
 )
 ```
 
-<!-- # Jammer (Oppo) -->
+# Blocker
 
 ```{r}
-# plotOutput("jammer_points2")
+# Radio buttons to toggle between plots
+radioButtons(
+  "plot_choice2", 
+  "",
+  choices = c(
+    "HARD",
+    "Opponent"
+  ),
+  inline = TRUE
+)
+# Conditional panels to display the chosen plot
+conditionalPanel(
+  condition = "input.plot_choice2 == 'HARD'",
+  plotOutput("blocker_points1")
+)
+conditionalPanel(
+  condition = "input.plot_choice2 == 'Opponent'",
+  plotOutput("blocker_points2")
+)
 ```
 
 
@@ -561,13 +606,15 @@ output$valueBox2 <- shinydashboard::renderValueBox({
 ## display scoreboard (worm plot) ----
 output$scoreboard <- renderPlot({
   p <- tidy_scoreboard() |> 
-    plot_scoreboard()
+    plot_scoreboard(
+      team_colors = team_colors
+    )
   
   print(p)
 })
 
 # JAMMER STATS (HARD) ----
-tidy_individual1 <- reactive({
+tidy_jammer1 <- reactive({
   data$df |> 
     mutate(
       jam_number = row_number()
@@ -599,13 +646,12 @@ tidy_individual1 <- reactive({
       n_points_sum = sum(points_diff)
     ) |> 
     mutate(
-      team = team1,
-      
+      team = team1
     )
 })
 
 # INDIVIDUAL STATS (Oppo) ----
-tidy_individual2 <- reactive({
+tidy_jammer2 <- reactive({
   data$df |> 
     mutate(
       jam_number = row_number()
@@ -644,18 +690,18 @@ tidy_individual2 <- reactive({
 
 # jammer points (hard)
 output$jammer_points1 <- renderPlot({
-  p1 <- tidy_individual1() |> 
+  p1 <- tidy_jammer1() |> 
     plot_jammer_stats(
       team_color = team_colors[1]
     )
-    
+
   print(p1)
 })
 
 
 # jammer points (Oppo)
 output$jammer_points2 <- renderPlot({
-  p2 <- tidy_individual2() |> 
+  p2 <- tidy_jammer2() |> 
     plot_jammer_stats(
       team_color = team_colors[2]
     )
@@ -664,8 +710,109 @@ output$jammer_points2 <- renderPlot({
 })
 
 
-## Blocker stats
+## Blocker stats (HARD) ----
+tidy_blocker1 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      blocker = blockers1,
+      lead,
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points1 - points2
+    ) |> 
+    tidyr::separate_longer_delim(
+      blocker,
+      delim = ", "
+    ) |> 
+    group_by(
+      blocker
+    ) |> 
+    reframe(
+      n_jams = n(),
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team1) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team1) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
+    ) |> 
+    mutate(
+      team = team1
+    )
+})
 
+# INDIVIDUAL STATS (Oppo) ----
+tidy_blocker2 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      blocker = blockers2,
+      lead,
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points2 - points1
+    ) |> 
+    tidyr::separate_longer_delim(
+      blocker,
+      delim = ", "
+    ) |> 
+    group_by(
+      blocker
+    ) |> 
+    reframe(
+      n_jams = n(),
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team2) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team2) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
+    ) |> 
+    mutate(
+      team = team2
+    )
+    
+})
+
+# jammer points (hard)
+output$blocker_points1 <- renderPlot({
+  p1 <- tidy_blocker1() |> 
+    plot_blocker_stats(
+      team_color = team_colors[1]
+    )
+
+  print(p1)
+})
+
+
+# jammer points (Oppo)
+output$blocker_points2 <- renderPlot({
+  p2 <- tidy_blocker2() |> 
+    plot_blocker_stats(
+      team_color = team_colors[2]
+    )
+    
+  print(p2)
+})
 
 ```
 

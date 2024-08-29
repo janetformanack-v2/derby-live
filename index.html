@@ -6219,7 +6219,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td.child,table.dataTable.dtr-inlin
         <div class="navbar-author">( LIVE )</div>
       </div>
     </div>
-<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-scoreboard" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#scoreboard" data-scrolling="false" href="#scoreboard" aria-controls="scoreboard" aria-selected="true"><span class="nav-link-text">Scoreboard</span></a></li><li class="nav-item" role="presentation"><a id="tab-jammer" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#jammer" data-scrolling="false" href="#jammer" aria-controls="jammer" aria-selected="false"><span class="nav-link-text">Jammer</span></a></li><li class="nav-item" role="presentation"><a id="tab-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data" data-scrolling="false" href="#data" aria-controls="data" aria-selected="false"><span class="nav-link-text">Data</span></a></li></ul></div></div>
+<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-scoreboard" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#scoreboard" data-scrolling="false" href="#scoreboard" aria-controls="scoreboard" aria-selected="true"><span class="nav-link-text">Scoreboard</span></a></li><li class="nav-item" role="presentation"><a id="tab-jammer" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#jammer" data-scrolling="false" href="#jammer" aria-controls="jammer" aria-selected="false"><span class="nav-link-text">Jammer</span></a></li><li class="nav-item" role="presentation"><a id="tab-blocker" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#blocker" data-scrolling="false" href="#blocker" aria-controls="blocker" aria-selected="false"><span class="nav-link-text">Blocker</span></a></li><li class="nav-item" role="presentation"><a id="tab-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data" data-scrolling="false" href="#data" aria-controls="data" aria-selected="false"><span class="nav-link-text">Data</span></a></li></ul></div></div>
 </nav>
 </header>
 <div class="page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill quarto-dashboard-pages dashboard-sidebar-container">  
@@ -6246,19 +6246,40 @@ margin-bottom: 0 !important;
 <!--   width: 500px !important; -->
 <!-- } -->
 
+.dashboard-page {
+  width: 100%;
+  margin-left: 0;
+}
+
 .toolbar {
   background-color: #A2C5C9 !important;
   color: black;
-  font-size: 24px !important;
-  width: 100% !important;
+  font-size: 16px; 
+  width: 100%;
   display: flex;
   flex-direction: column;
-  grid-template-columns: 1fr 2fr;
-  margin-top: 2px !important;
-  padding: 10px !important;
+  margin-top: 2px;
+  padding: 10px; 
   box-sizing: border-box;
-  justify-content: space-between !important;
-  align-items: stretch !important;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+
+@media (min-width: 768px) {
+
+  .dashboard-page {
+    width: 130% !important;
+    margin-left: -150px;
+  }
+
+  .toolbar {
+    background-color: #A2C5C9 !important;
+    color: black;
+    font-size: 24px !important;
+    width: 70% !important;
+    padding: 30px !important;
+  }
 }
 
 .toolbar-header {
@@ -6303,10 +6324,14 @@ margin-bottom: 0 !important;
 }
 
 .radio {
-  margin-bottom: -10px !important;
-  }
+  font-size: 20px !important;
+  margin-bottom: -20px !important;
+  margin-top: 0;
+}
+
 .shiny-plot-output {
-  margin-top: -10px !important;
+  margin-top: -15px !important;
+  margin-bottom: -10px !important
 }
 
 </style>
@@ -6446,12 +6471,12 @@ grid-auto-rows: minmax(0, 1fr);">
 Save data
 </button>
 <button id="default" type="button" class="btn btn-default action-button" style="
-        color: #fff; 
-        background-color: green; 
-        border-color: #2e6da4; 
+        color: #fff;
+        background-color: green;
+        border-color: #2e6da4;
         width: 100%;
       ">
-<i class="far fa-reset" role="presentation" aria-label="reset icon"></i>
+<i class="fas fa-arrows-rotate" role="presentation" aria-label="arrows-rotate icon"></i>
 Reset defaults
 </button>
 <button id="clear" type="button" class="btn btn-default action-button" style="
@@ -6523,27 +6548,27 @@ grid-auto-rows: minmax(0, 1fr);">
 <div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init data-require-bs-caller="card()" data-full-screen="false">
 <div class="card-body html-fill-item html-fill-container">
 <div class="cell-output-display html-fill-item html-fill-container">
-<div id="plot_choice" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline html-fill-item html-fill-container" role="radiogroup" aria-labelledby="plot_choice-label">
-<label class="control-label" id="plot_choice-label" for="plot_choice"></label>
+<div id="plot_choice1" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline html-fill-item html-fill-container" role="radiogroup" aria-labelledby="plot_choice1-label">
+<label class="control-label" id="plot_choice1-label" for="plot_choice1"></label>
 <div class="shiny-options-group html-fill-item html-fill-container">
 <label class="radio-inline">
-<input type="radio" name="plot_choice" value="jammer_points1" checked="checked">
+<input type="radio" name="plot_choice1" value="HARD" checked="checked">
 <span>HARD</span>
 </label>
 <label class="radio-inline">
-<input type="radio" name="plot_choice" value="jammer_points2">
+<input type="radio" name="plot_choice1" value="Opponent">
 <span>Opponent</span>
 </label>
 </div>
 </div>
 </div>
 <div class="cell-output-display html-fill-item html-fill-container">
-<div data-display-if="input.plot_choice == &#39;jammer_points1&#39;" data-ns-prefix class="html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice1 == &#39;HARD&#39;" data-ns-prefix class="html-fill-item html-fill-container">
 <div class="shiny-plot-output html-fill-item html-fill-container" id="jammer_points1" style="width:100%;height:400px;"></div>
 </div>
 </div>
 <div class="cell-output-display html-fill-item html-fill-container">
-<div data-display-if="input.plot_choice == &#39;jammer_points2&#39;" data-ns-prefix class="html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice1 == &#39;Opponent&#39;" data-ns-prefix class="html-fill-item html-fill-container">
 <div class="shiny-plot-output html-fill-item html-fill-container" id="jammer_points2" style="width:100%;height:400px;"></div>
 </div>
 </div>
@@ -6554,7 +6579,43 @@ grid-auto-rows: minmax(0, 1fr);">
         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z" /></svg>
     </span>
 </bslib-tooltip><script data-bslib-card-init>bslib.Card.initializeAllCards();</script></div>
-<!-- # Jammer (Oppo) -->
+</div>
+</div><div id="blocker" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-blocker">
+<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div id="plot_choice2" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline html-fill-item html-fill-container" role="radiogroup" aria-labelledby="plot_choice2-label">
+<label class="control-label" id="plot_choice2-label" for="plot_choice2"></label>
+<div class="shiny-options-group html-fill-item html-fill-container">
+<label class="radio-inline">
+<input type="radio" name="plot_choice2" value="HARD" checked="checked">
+<span>HARD</span>
+</label>
+<label class="radio-inline">
+<input type="radio" name="plot_choice2" value="Opponent">
+<span>Opponent</span>
+</label>
+</div>
+</div>
+</div>
+<div class="cell-output-display html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice2 == &#39;HARD&#39;" data-ns-prefix class="html-fill-item html-fill-container">
+<div class="shiny-plot-output html-fill-item html-fill-container" id="blocker_points1" style="width:100%;height:400px;"></div>
+</div>
+</div>
+<div class="cell-output-display html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice2 == &#39;Opponent&#39;" data-ns-prefix class="html-fill-item html-fill-container">
+<div class="shiny-plot-output html-fill-item html-fill-container" id="blocker_points2" style="width:100%;height:400px;"></div>
+</div>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z" /></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init>bslib.Card.initializeAllCards();</script></div>
 </div>
 </div><div id="data" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-data">
 <div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
@@ -6601,59 +6662,59 @@ HARD
 <label class="control-label" id="blockers1-label" for="blockers1">Select Blockers (hard)</label>
 <div class="shiny-options-group">
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="0">
+<input type="checkbox" name="blockers1" value="0" checked="checked">
 <span>0</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="1">
+<input type="checkbox" name="blockers1" value="1" checked="checked">
 <span>1</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="13">
+<input type="checkbox" name="blockers1" value="13" checked="checked">
 <span>13</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="23">
+<input type="checkbox" name="blockers1" value="23" checked="checked">
 <span>23</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="24">
+<input type="checkbox" name="blockers1" value="24" checked="checked">
 <span>24</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="32">
+<input type="checkbox" name="blockers1" value="32" checked="checked">
 <span>32</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="73">
+<input type="checkbox" name="blockers1" value="73" checked="checked">
 <span>73</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="76">
+<input type="checkbox" name="blockers1" value="76" checked="checked">
 <span>76</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="142">
+<input type="checkbox" name="blockers1" value="142" checked="checked">
 <span>142</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="314">
+<input type="checkbox" name="blockers1" value="314" checked="checked">
 <span>314</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="321">
+<input type="checkbox" name="blockers1" value="321" checked="checked">
 <span>321</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="750">
+<input type="checkbox" name="blockers1" value="750" checked="checked">
 <span>750</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="802">
+<input type="checkbox" name="blockers1" value="802" checked="checked">
 <span>802</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="1414">
+<input type="checkbox" name="blockers1" value="1414" checked="checked">
 <span>1414</span>
 </label>
 </div>
@@ -6693,82 +6754,71 @@ ELEVATED
 <label class="control-label" id="blockers2-label" for="blockers2">Select Blockers (elevated)</label>
 <div class="shiny-options-group">
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="9">
+<input type="checkbox" name="blockers2" value="9" checked="checked">
 <span>9</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="11">
+<input type="checkbox" name="blockers2" value="11" checked="checked">
 <span>11</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="15">
+<input type="checkbox" name="blockers2" value="15" checked="checked">
 <span>15</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="34">
+<input type="checkbox" name="blockers2" value="34" checked="checked">
 <span>34</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="45">
+<input type="checkbox" name="blockers2" value="45" checked="checked">
 <span>45</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="187">
+<input type="checkbox" name="blockers2" value="187" checked="checked">
 <span>187</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="248">
+<input type="checkbox" name="blockers2" value="248" checked="checked">
 <span>248</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="321">
+<input type="checkbox" name="blockers2" value="321" checked="checked">
 <span>321</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="329">
+<input type="checkbox" name="blockers2" value="329" checked="checked">
 <span>329</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="414">
+<input type="checkbox" name="blockers2" value="414" checked="checked">
 <span>414</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="484">
+<input type="checkbox" name="blockers2" value="484" checked="checked">
 <span>484</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="505">
+<input type="checkbox" name="blockers2" value="505" checked="checked">
 <span>505</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="909">
+<input type="checkbox" name="blockers2" value="909" checked="checked">
 <span>909</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="999">
+<input type="checkbox" name="blockers2" value="999" checked="checked">
 <span>999</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="1226">
+<input type="checkbox" name="blockers2" value="1226" checked="checked">
 <span>1226</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="1313">
+<input type="checkbox" name="blockers2" value="1313" checked="checked">
 <span>1313</span>
 </label>
 </div>
 </div>
-</div>
-<div class="cell-output-display">
-<button id="resetapp" type="button" class="btn btn-default action-button" style="
-    color: #fff; 
-    background-color: #C13C37; 
-    border-color: red; 
-    width: 100%;
-  ">
-<i class="fas fa-arrows-rotate" role="presentation" aria-label="arrows-rotate icon"></i>
-Reset App
-</button>
 </div>
 </section>
 </div></aside>
@@ -6797,7 +6847,7 @@ team1 <- "hard"
 team2 <- setdiff(team_names, team1)
 
 # Specify team colors
-team_colors <- c("#B22EF0", "grey10")
+team_colors <- c("#622773", "grey10")
 
 # Get names and numbers of players
 # team1: hard
@@ -6989,13 +7039,15 @@ output$valueBox2 <- shinydashboard::renderValueBox({
 ## display scoreboard (worm plot) ----
 output$scoreboard <- renderPlot({
   p <- tidy_scoreboard() |> 
-    plot_scoreboard()
+    plot_scoreboard(
+      team_colors = team_colors
+    )
   
   print(p)
 })
 
 # JAMMER STATS (HARD) ----
-tidy_individual1 <- reactive({
+tidy_jammer1 <- reactive({
   data$df |> 
     mutate(
       jam_number = row_number()
@@ -7027,13 +7079,12 @@ tidy_individual1 <- reactive({
       n_points_sum = sum(points_diff)
     ) |> 
     mutate(
-      team = team1,
-      
+      team = team1
     )
 })
 
 # INDIVIDUAL STATS (Oppo) ----
-tidy_individual2 <- reactive({
+tidy_jammer2 <- reactive({
   data$df |> 
     mutate(
       jam_number = row_number()
@@ -7072,18 +7123,18 @@ tidy_individual2 <- reactive({
 
 # jammer points (hard)
 output$jammer_points1 <- renderPlot({
-  p1 <- tidy_individual1() |> 
+  p1 <- tidy_jammer1() |> 
     plot_jammer_stats(
       team_color = team_colors[1]
     )
-    
+
   print(p1)
 })
 
 
 # jammer points (Oppo)
 output$jammer_points2 <- renderPlot({
-  p2 <- tidy_individual2() |> 
+  p2 <- tidy_jammer2() |> 
     plot_jammer_stats(
       team_color = team_colors[2]
     )
@@ -7092,8 +7143,109 @@ output$jammer_points2 <- renderPlot({
 })
 
 
-## Blocker stats
+## Blocker stats (HARD) ----
+tidy_blocker1 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      blocker = blockers1,
+      lead,
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points1 - points2
+    ) |> 
+    tidyr::separate_longer_delim(
+      blocker,
+      delim = ", "
+    ) |> 
+    group_by(
+      blocker
+    ) |> 
+    reframe(
+      n_jams = n(),
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team1) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team1) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
+    ) |> 
+    mutate(
+      team = team1
+    )
+})
 
+# INDIVIDUAL STATS (Oppo) ----
+tidy_blocker2 <- reactive({
+  data$df |> 
+    mutate(
+      jam_number = row_number()
+    ) |> 
+    select(
+      jam_number,
+      blocker = blockers2,
+      lead,
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points2 - points1
+    ) |> 
+    tidyr::separate_longer_delim(
+      blocker,
+      delim = ", "
+    ) |> 
+    group_by(
+      blocker
+    ) |> 
+    reframe(
+      n_jams = n(),
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team2) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team2) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
+    ) |> 
+    mutate(
+      team = team2
+    )
+    
+})
+
+# jammer points (hard)
+output$blocker_points1 <- renderPlot({
+  p1 <- tidy_blocker1() |> 
+    plot_blocker_stats(
+      team_color = team_colors[1]
+    )
+
+  print(p1)
+})
+
+
+# jammer points (Oppo)
+output$blocker_points2 <- renderPlot({
+  p2 <- tidy_blocker2() |> 
+    plot_blocker_stats(
+      team_color = team_colors[2]
+    )
+    
+  print(p2)
+})
 
 </script>
  
@@ -7126,7 +7278,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
 </p>
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="dependencies">
-{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.12.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.7.4.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.12.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.7.4.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["6.4.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.min.css","css/v4-shims.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fontawesome"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.2"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["6.4.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.min.css","css/v4-shims.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fontawesome"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.2"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]}]}
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.12.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.7.4.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.12.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.7.4.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["6.4.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.min.css","css/v4-shims.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fontawesome"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.2"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]}]}
 </script>
 <!--/html_preserve-->
 <!--html_preserve-->

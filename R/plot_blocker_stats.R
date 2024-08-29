@@ -1,9 +1,9 @@
-plot_jammer_stats <- function(data, team_color) {
+plot_blocker_stats <- function(data, team_color) {
   data |> 
     # transform
     select(
       team,
-      jammer,
+      blocker,
       n_jams,
       percent_jams_lead,
       percent_jams_penalty,
@@ -30,15 +30,38 @@ plot_jammer_stats <- function(data, team_color) {
             "Percent Penalty"
           )
         )
+    ) |>
+    arrange(
+      what,
+      desc(value)
     ) |> 
+    group_by(
+      what
+    ) |> 
+    mutate(
+      rank = row_number()
+    ) |> 
+    ungroup() |> 
+    filter(
+      rank <= 10
+    ) |> 
+    # group_by(
+    #   team,
+    #   what,
+    #   value
+    # ) |>
+    # reframe(
+    #   blocker = paste(unique(blocker), collapse = ",")
+    # ) |>
     # plot
     ggplot(
       aes(
         x = value,
         y = forcats::fct_reorder(
-          as.factor(jammer),
+          as.factor(blocker),
           value
         ),
+        group = what,
         color = team,
         fill = team
       )
@@ -47,7 +70,7 @@ plot_jammer_stats <- function(data, team_color) {
       ~ what,
       ncol = 2,
       nrow = 2,
-      scales = "free_x"
+      scales = "free"
     ) +
     geom_vline(
       xintercept = 0,
@@ -64,20 +87,20 @@ plot_jammer_stats <- function(data, team_color) {
     #   alpha = 0.7,
     #   stroke = 2
     # ) +
-    # labs(
-    #   title = "",
-    #   x = "",
-    #   y = ""
-    # ) +
+    labs(
+      title = "",
+      x = "",
+      y = ""
+    ) +
     # scale_y_continuous(
     #   limits = c(0, max(scores_now()) + 10),
     #   breaks = scales::breaks_pretty()
     # ) +
     scale_x_continuous(
       # breaks = scales::breaks_pretty(),
-      n.breaks = 3
+      n.breaks = 4
     ) +
-    theme_minimal(27) +
+    theme_minimal(20) +
     scale_fill_manual(
       # values = c("#B22EF0", "grey10")
       values = team_color
@@ -90,8 +113,8 @@ plot_jammer_stats <- function(data, team_color) {
       legend.position = "none",
       plot.title = element_blank(),
       legend.title = element_blank(),
-      axis.title = element_blank(),
-      axis.text = element_text(size = 20),
-      panel.spacing.x = grid::unit(3, "lines")
+      axis.title.y = element_blank(),
+      axis.text = element_text(size = 16),
+      axis.title.x = element_blank()
     )
 }

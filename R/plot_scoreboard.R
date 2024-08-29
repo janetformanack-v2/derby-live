@@ -1,5 +1,5 @@
 plot_scoreboard <- function(data, 
-                            team_colors = c("#B22EF0", "grey10")) {
+                            team_colors) {
   
   max_score <- max(data$cum_points)
   
