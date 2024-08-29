@@ -6219,7 +6219,7 @@ table.dataTable.dtr-inline.collapsed>tbody>tr>td.child,table.dataTable.dtr-inlin
         <div class="navbar-author">( LIVE )</div>
       </div>
     </div>
-<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-scoreboard" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#scoreboard" data-scrolling="false" href="#scoreboard" aria-controls="scoreboard" aria-selected="true"><span class="nav-link-text">Scoreboard</span></a></li><li class="nav-item" role="presentation"><a id="tab-jammer-hard" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#jammer-hard" data-scrolling="false" href="#jammer-hard" aria-controls="jammer-hard" aria-selected="false"><span class="nav-link-text">Jammer (HARD)</span></a></li><li class="nav-item" role="presentation"><a id="tab-jammer-oppo" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#jammer-oppo" data-scrolling="false" href="#jammer-oppo" aria-controls="jammer-oppo" aria-selected="false"><span class="nav-link-text">Jammer (Oppo)</span></a></li><li class="nav-item" role="presentation"><a id="tab-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data" data-scrolling="false" href="#data" aria-controls="data" aria-selected="false"><span class="nav-link-text">Data</span></a></li></ul></div></div>
+<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-scoreboard" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#scoreboard" data-scrolling="false" href="#scoreboard" aria-controls="scoreboard" aria-selected="true"><span class="nav-link-text">Scoreboard</span></a></li><li class="nav-item" role="presentation"><a id="tab-jammer" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#jammer" data-scrolling="false" href="#jammer" aria-controls="jammer" aria-selected="false"><span class="nav-link-text">Jammer</span></a></li><li class="nav-item" role="presentation"><a id="tab-data" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data" data-scrolling="false" href="#data" aria-controls="data" aria-selected="false"><span class="nav-link-text">Data</span></a></li></ul></div></div>
 </nav>
 </header>
 <div class="page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill quarto-dashboard-pages dashboard-sidebar-container">  
@@ -6253,7 +6253,7 @@ margin-bottom: 0 !important;
   width: 100% !important;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  grid-template-columns: 1fr 2fr;
   margin-top: 2px !important;
   padding: 10px !important;
   box-sizing: border-box;
@@ -6289,7 +6289,7 @@ margin-bottom: 0 !important;
 }
 .sweet-alert .cancel {
   color: black !important; 
-  background-color: grey50 !important;
+  background-color: grey !important;
 }
 
 <!-- /* Optional: Change text size for buttons */ -->
@@ -6300,6 +6300,13 @@ margin-bottom: 0 !important;
 .value-box-title {
   font-size: 48px !important;
   text-align: left;
+}
+
+.radio {
+  margin-bottom: -10px !important;
+  }
+.shiny-plot-output {
+  margin-top: -10px !important;
 }
 
 </style>
@@ -6365,7 +6372,7 @@ grid-auto-rows: minmax(0, 1fr);">
 </div>
 </div>
 <div class="form-group shiny-input-container" style="width:100px;">
-<label class="control-label" id="points2-label" for="points2">black: </label>
+<label class="control-label" id="points2-label" for="points2">elevated: </label>
 <div>
 <select id="points2" class="form-control"><option value="0" selected>0</option>
 <option value="1">1</option>
@@ -6416,7 +6423,7 @@ grid-auto-rows: minmax(0, 1fr);">
 <label class="control-label" id="lead-label" for="lead">Lead jammer?</label>
 <div>
 <select id="lead" class="form-control"><option value="hard">hard</option>
-<option value="black">black</option>
+<option value="elevated">elevated</option>
 <option value="none" selected>none</option></select>
 </div>
 </div>
@@ -6425,7 +6432,7 @@ grid-auto-rows: minmax(0, 1fr);">
 <div>
 <select id="jammer_penalty" class="form-control"><option value="none" selected>none</option>
 <option value="hard">hard</option>
-<option value="black">black</option>
+<option value="elevated">elevated</option>
 <option value="both">both</option></select>
 </div>
 </div>
@@ -6437,6 +6444,15 @@ grid-auto-rows: minmax(0, 1fr);">
       ">
 <i class="far fa-floppy-disk" role="presentation" aria-label="floppy-disk icon"></i>
 Save data
+</button>
+<button id="default" type="button" class="btn btn-default action-button" style="
+        color: #fff; 
+        background-color: green; 
+        border-color: #2e6da4; 
+        width: 100%;
+      ">
+<i class="far fa-reset" role="presentation" aria-label="reset icon"></i>
+Reset defaults
 </button>
 <button id="clear" type="button" class="btn btn-default action-button" style="
         color: #fff; 
@@ -6502,35 +6518,43 @@ grid-auto-rows: minmax(0, 1fr);">
 </bslib-tooltip><script data-bslib-card-init>bslib.Card.initializeAllCards();</script></div>
 </div>
 </div>
-</div><div id="jammer-hard" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-jammer-hard">
+</div><div id="jammer" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-jammer">
 <div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
 <div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init data-require-bs-caller="card()" data-full-screen="false">
 <div class="card-body html-fill-item html-fill-container">
 <div class="cell-output-display html-fill-item html-fill-container">
+<div id="plot_choice" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline html-fill-item html-fill-container" role="radiogroup" aria-labelledby="plot_choice-label">
+<label class="control-label" id="plot_choice-label" for="plot_choice"></label>
+<div class="shiny-options-group html-fill-item html-fill-container">
+<label class="radio-inline">
+<input type="radio" name="plot_choice" value="jammer_points1" checked="checked">
+<span>HARD</span>
+</label>
+<label class="radio-inline">
+<input type="radio" name="plot_choice" value="jammer_points2">
+<span>Opponent</span>
+</label>
+</div>
+</div>
+</div>
+<div class="cell-output-display html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice == &#39;jammer_points1&#39;" data-ns-prefix class="html-fill-item html-fill-container">
 <div class="shiny-plot-output html-fill-item html-fill-container" id="jammer_points1" style="width:100%;height:400px;"></div>
 </div>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z" /></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init>bslib.Card.initializeAllCards();</script></div>
-</div>
-</div><div id="jammer-oppo" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-jammer-oppo">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
 <div class="cell-output-display html-fill-item html-fill-container">
+<div data-display-if="input.plot_choice == &#39;jammer_points2&#39;" data-ns-prefix class="html-fill-item html-fill-container">
 <div class="shiny-plot-output html-fill-item html-fill-container" id="jammer_points2" style="width:100%;height:400px;"></div>
 </div>
 </div>
+</div>
 <bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
     <template>Expand</template>
     <span class="bslib-full-screen-enter badge rounded-pill">
         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z" /></svg>
     </span>
 </bslib-tooltip><script data-bslib-card-init>bslib.Card.initializeAllCards();</script></div>
+<!-- # Jammer (Oppo) -->
 </div>
 </div><div id="data" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-data">
 <div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
@@ -6563,14 +6587,11 @@ HARD
 <div class="form-group shiny-input-container">
 <label class="control-label" id="jammer1-label" for="jammer1">Select Jammer (hard)</label>
 <div>
-<select id="jammer1"><option value="42" selected>42</option>
-<option value="20">20</option>
-<option value="1">1</option>
-<option value="73">73</option>
-<option value="24">24</option>
-<option value="817">817</option>
-<option value="13">13</option>
-<option value="11">11</option></select>
+<select id="jammer1"><option value="24" selected>24</option>
+<option value="76">76</option>
+<option value="314">314</option>
+<option value="321">321</option>
+<option value="1414">1414</option></select>
 <script type="application/json" data-for="jammer1" data-nonempty>{"plugins":["selectize-plugin-a11y"]}</script>
 </div>
 </div>
@@ -6580,104 +6601,160 @@ HARD
 <label class="control-label" id="blockers1-label" for="blockers1">Select Blockers (hard)</label>
 <div class="shiny-options-group">
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="Uncheck All Boxes">
-<span>Uncheck All Boxes</span>
-</label>
-<label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="42">
-<span>42</span>
-</label>
-<label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="20">
-<span>20</span>
+<input type="checkbox" name="blockers1" value="0">
+<span>0</span>
 </label>
 <label class="checkbox-inline">
 <input type="checkbox" name="blockers1" value="1">
 <span>1</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="73">
-<span>73</span>
+<input type="checkbox" name="blockers1" value="13">
+<span>13</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="23">
+<span>23</span>
 </label>
 <label class="checkbox-inline">
 <input type="checkbox" name="blockers1" value="24">
 <span>24</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="817">
-<span>817</span>
+<input type="checkbox" name="blockers1" value="32">
+<span>32</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="13">
-<span>13</span>
+<input type="checkbox" name="blockers1" value="73">
+<span>73</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers1" value="11">
-<span>11</span>
+<input type="checkbox" name="blockers1" value="76">
+<span>76</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="142">
+<span>142</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="314">
+<span>314</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="321">
+<span>321</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="750">
+<span>750</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="802">
+<span>802</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers1" value="1414">
+<span>1414</span>
 </label>
 </div>
 </div>
 </div>
 </section>
-<section id="black">
+<section id="elevated">
 <div class="h3">
-BLACK
+ELEVATED
 </div>
 <div class="cell-output-display no-overflow-x">
 <div class="form-group shiny-input-container">
-<label class="control-label" id="jammer2-label" for="jammer2">Select Jammer (black)</label>
+<label class="control-label" id="jammer2-label" for="jammer2">Select Jammer (elevated)</label>
 <div>
-<select id="jammer2"><option value="36" selected>36</option>
-<option value="1414">1414</option>
-<option value="314">314</option>
-<option value="4">4</option>
-<option value="802">802</option>
-<option value="420">420</option>
-<option value="23">23</option>
-<option value="0">0</option></select>
+<select id="jammer2"><option value="9" selected>9</option>
+<option value="11">11</option>
+<option value="15">15</option>
+<option value="34">34</option>
+<option value="45">45</option>
+<option value="187">187</option>
+<option value="248">248</option>
+<option value="321">321</option>
+<option value="329">329</option>
+<option value="414">414</option>
+<option value="484">484</option>
+<option value="505">505</option>
+<option value="909">909</option>
+<option value="999">999</option>
+<option value="1226">1226</option>
+<option value="1313">1313</option></select>
 <script type="application/json" data-for="jammer2" data-nonempty>{"plugins":["selectize-plugin-a11y"]}</script>
 </div>
 </div>
 </div>
 <div class="cell-output-display">
 <div id="blockers2" class="form-group shiny-input-checkboxgroup shiny-input-container shiny-input-container-inline" role="group" aria-labelledby="blockers2-label">
-<label class="control-label" id="blockers2-label" for="blockers2">Select Blockers (black)</label>
+<label class="control-label" id="blockers2-label" for="blockers2">Select Blockers (elevated)</label>
 <div class="shiny-options-group">
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="Uncheck All Boxes">
-<span>Uncheck All Boxes</span>
+<input type="checkbox" name="blockers2" value="9">
+<span>9</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="36">
-<span>36</span>
+<input type="checkbox" name="blockers2" value="11">
+<span>11</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="1414">
-<span>1414</span>
+<input type="checkbox" name="blockers2" value="15">
+<span>15</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="314">
-<span>314</span>
+<input type="checkbox" name="blockers2" value="34">
+<span>34</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="4">
-<span>4</span>
+<input type="checkbox" name="blockers2" value="45">
+<span>45</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="802">
-<span>802</span>
+<input type="checkbox" name="blockers2" value="187">
+<span>187</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="420">
-<span>420</span>
+<input type="checkbox" name="blockers2" value="248">
+<span>248</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="23">
-<span>23</span>
+<input type="checkbox" name="blockers2" value="321">
+<span>321</span>
 </label>
 <label class="checkbox-inline">
-<input type="checkbox" name="blockers2" value="0">
-<span>0</span>
+<input type="checkbox" name="blockers2" value="329">
+<span>329</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="414">
+<span>414</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="484">
+<span>484</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="505">
+<span>505</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="909">
+<span>909</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="999">
+<span>999</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="1226">
+<span>1226</span>
+</label>
+<label class="checkbox-inline">
+<input type="checkbox" name="blockers2" value="1313">
+<span>1313</span>
 </label>
 </div>
 </div>
@@ -6723,8 +6800,33 @@ team2 <- setdiff(team_names, team1)
 team_colors <- c("#B22EF0", "grey10")
 
 # Get names and numbers of players
-players1 <- roster |> filter(team == team1) |> pull(player_number)
-players2 <- roster |> filter(team == team2) |> pull(player_number)
+# team1: hard
+players1 <- roster |> 
+  filter(team == team1) |> 
+  select(
+    player_number,
+    player_name
+  ) |>
+  arrange(
+    as.numeric(player_number)
+  ) |> 
+  pull(player_number)
+jammers1 <- roster |> 
+  filter(team == team1 & !is.na(jammer)) |> 
+  select(
+    player_number,
+    player_name
+  ) |>
+  arrange(
+    as.numeric(player_number)
+  ) |> 
+  pull(player_number)
+# team2: opponent
+players2 <- roster |> 
+  filter(team == team2) |> 
+  pull(player_number) |>
+  as.numeric() |> 
+  sort()
 
 # Initialize reactiveValues to store the data
 data <- reactiveValues(
@@ -6744,24 +6846,15 @@ data <- reactiveValues(
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-observeEvent(input$blockers1, {
-  if ("Uncheck All Boxes" %in% input$blockers1) {
-    updateCheckboxGroupInput(
-      session, 
-      "blockers1", 
-      selected = character(0)
-    )
-  }
-})
-
-observeEvent(input$blockers2, {
-  if ("Uncheck All Boxes" %in% input$blockers2) {
-    updateCheckboxGroupInput(
-      session, 
-      "blockers2", 
-      selected = character(0)
-    )
-  }
+observeEvent(input$default, {
+  updateSelectInput(session, "jammer1", selected = jammers1[1])
+  updateCheckboxGroupInput(session, "blockers1", selected = character(0))
+  updateSelectInput(session, "jammer2", selected = players2[1])
+  updateCheckboxGroupInput(session, "blockers2", selected = character(0))
+  updateSelectInput(session, "points1", selected = 0)
+  updateSelectInput(session, "points2", selected = 0)
+  updateSelectInput(session, "lead", selected = "none")
+  updateSelectInput(session, "jammer_penalty", selected = "none")
 })
 
 observeEvent(input$save, {
@@ -6909,26 +7002,33 @@ tidy_individual1 <- reactive({
     ) |> 
     select(
       jam_number,
-      jammer1,
+      jammer = jammer1,
       lead,
-      points1
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points1 - points2
     ) |> 
     group_by(
-      jammer1
+      jammer
     ) |> 
     reframe(
       n_jams = n(),
-      which_jams = list(jam_number),
-      n_jams_lead = sum(lead == team1),
-      n_points_list = list(points1),
-      n_points_sum = sum(points1)
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team1) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team1) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
     ) |> 
     mutate(
       team = team1,
-      n_points_jam = round(n_points_sum / n_jams, 0)
-    ) |> 
-    rename(
-      jammer = jammer1
+      
     )
 })
 
@@ -6940,26 +7040,32 @@ tidy_individual2 <- reactive({
     ) |> 
     select(
       jam_number,
-      jammer2,
+      jammer = jammer2,
       lead,
-      points2
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points2 - points1
     ) |> 
     group_by(
-      jammer2
+      jammer
     ) |> 
     reframe(
       n_jams = n(),
-      which_jams = list(jam_number),
-      n_jams_lead = sum(lead == team2),
-      n_points_list = list(points2),
-      n_points_sum = sum(points2)
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team2) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team2) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
     ) |> 
     mutate(
-      team = team2,
-      n_points_jam = round(n_points_sum / n_jams, 0)
-    ) |> 
-    rename(
-      jammer = jammer2
+      team = team2
     )
     
 })
@@ -6967,30 +7073,6 @@ tidy_individual2 <- reactive({
 # jammer points (hard)
 output$jammer_points1 <- renderPlot({
   p1 <- tidy_individual1() |> 
-    select(
-      team,
-      jammer,
-      n_jams,
-      n_jams_lead,
-      n_points_sum,
-      n_points_jam
-    ) |> 
-    tidyr::pivot_longer(
-      cols = matches("^n_"),
-      names_to = "what",
-      values_to = "value"
-    ) |> 
-    mutate(
-      what = factor(
-        what,
-        levels = c(
-          "n_jams",
-          "n_jams_lead",
-          "n_points_sum",
-          "n_points_jam"
-        )
-      )
-    ) |> 
     plot_jammer_stats(
       team_color = team_colors[1]
     )
@@ -7002,30 +7084,6 @@ output$jammer_points1 <- renderPlot({
 # jammer points (Oppo)
 output$jammer_points2 <- renderPlot({
   p2 <- tidy_individual2() |> 
-    select(
-      team,
-      jammer,
-      n_jams,
-      n_jams_lead,
-      n_points_sum,
-      n_points_jam
-    ) |> 
-    tidyr::pivot_longer(
-      cols = matches("^n_"),
-      names_to = "what",
-      values_to = "value"
-    ) |> 
-    mutate(
-      what = factor(
-        what,
-        levels = c(
-          "n_jams",
-          "n_jams_lead",
-          "n_points_sum",
-          "n_points_jam"
-        )
-      )
-    ) |> 
     plot_jammer_stats(
       team_color = team_colors[2]
     )

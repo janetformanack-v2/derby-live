@@ -43,7 +43,7 @@ body, h1, h2, h3, h4, h5, h6, p {
   width: 100% !important;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  grid-template-columns: 1fr 2fr;
   margin-top: 2px !important;
   padding: 10px !important;
   box-sizing: border-box;
@@ -79,7 +79,7 @@ body, h1, h2, h3, h4, h5, h6, p {
 }
 .sweet-alert .cancel {
   color: black !important; 
-  background-color: grey50 !important;
+  background-color: grey !important;
 }
 
 <!-- /* Optional: Change text size for buttons */ -->
@@ -90,6 +90,13 @@ body, h1, h2, h3, h4, h5, h6, p {
 .value-box-title {
   font-size: 48px !important;
   text-align: left;
+}
+
+.radio {
+  margin-bottom: -10px !important;
+  }
+.shiny-plot-output {
+  margin-top: -10px !important;
 }
 
 </style>
@@ -155,8 +162,33 @@ team2 <- setdiff(team_names, team1)
 team_colors <- c("#B22EF0", "grey10")
 
 # Get names and numbers of players
-players1 <- roster |> filter(team == team1) |> pull(player_number)
-players2 <- roster |> filter(team == team2) |> pull(player_number)
+# team1: hard
+players1 <- roster |> 
+  filter(team == team1) |> 
+  select(
+    player_number,
+    player_name
+  ) |>
+  arrange(
+    as.numeric(player_number)
+  ) |> 
+  pull(player_number)
+jammers1 <- roster |> 
+  filter(team == team1 & !is.na(jammer)) |> 
+  select(
+    player_number,
+    player_name
+  ) |>
+  arrange(
+    as.numeric(player_number)
+  ) |> 
+  pull(player_number)
+# team2: opponent
+players2 <- roster |> 
+  filter(team == team2) |> 
+  pull(player_number) |>
+  as.numeric() |> 
+  sort()
 
 # Initialize reactiveValues to store the data
 data <- reactiveValues(
@@ -183,13 +215,13 @@ data <- reactiveValues(
 selectInput(
   "jammer1", 
   glue::glue("Select Jammer ({team1})"), 
-  choices = players1,
+  choices = jammers1,
   multiple = FALSE
 )
 checkboxGroupInput(
   "blockers1",
   glue::glue("Select Blockers ({team1})"),
-  choices = c("Uncheck All Boxes", players1),
+  choices = players1,
   inline = TRUE
 )
 
@@ -207,7 +239,7 @@ selectInput(
 checkboxGroupInput(
   "blockers2",
   glue::glue("Select Blockers ({team2})"),
-  choices = c("Uncheck All Boxes", players2),
+  choices = players2,
   inline = TRUE
 )
 
@@ -294,6 +326,18 @@ tags$div(
     ),
     
     actionButton(
+      "default", 
+      "Reset defaults", 
+      icon("reset"), 
+      style="
+        color: #fff; 
+        background-color: green; 
+        border-color: #2e6da4; 
+        width: 100%;
+      "
+    ),
+    
+    actionButton(
       "clear", 
       "Clear last entry", 
       icon("undo"), 
@@ -333,16 +377,34 @@ shinydashboard::valueBoxOutput("valueBox2")
 plotOutput("scoreboard")
 ```
 
-# Jammer (HARD)
+# Jammer
 
 ```{r}
-plotOutput("jammer_points1")
+# Radio buttons to toggle between plots
+radioButtons(
+  "plot_choice", 
+  "",
+  choices = c(
+    "HARD"       = "jammer_points1",
+    "Opponent"   = "jammer_points2"
+  ),
+  inline = TRUE
+)
+# Conditional panels to display the chosen plot
+conditionalPanel(
+  condition = "input.plot_choice == 'jammer_points1'",
+  plotOutput("jammer_points1")
+)
+conditionalPanel(
+  condition = "input.plot_choice == 'jammer_points2'",
+  plotOutput("jammer_points2")
+)
 ```
 
-# Jammer (Oppo)
+<!-- # Jammer (Oppo) -->
 
 ```{r}
-plotOutput("jammer_points2")
+# plotOutput("jammer_points2")
 ```
 
 
@@ -356,24 +418,15 @@ div(tableOutput("data_saved"), style = "font-size:40%")
 ```{r}
 #| context: server
 
-observeEvent(input$blockers1, {
-  if ("Uncheck All Boxes" %in% input$blockers1) {
-    updateCheckboxGroupInput(
-      session, 
-      "blockers1", 
-      selected = character(0)
-    )
-  }
-})
-
-observeEvent(input$blockers2, {
-  if ("Uncheck All Boxes" %in% input$blockers2) {
-    updateCheckboxGroupInput(
-      session, 
-      "blockers2", 
-      selected = character(0)
-    )
-  }
+observeEvent(input$default, {
+  updateSelectInput(session, "jammer1", selected = jammers1[1])
+  updateCheckboxGroupInput(session, "blockers1", selected = character(0))
+  updateSelectInput(session, "jammer2", selected = players2[1])
+  updateCheckboxGroupInput(session, "blockers2", selected = character(0))
+  updateSelectInput(session, "points1", selected = 0)
+  updateSelectInput(session, "points2", selected = 0)
+  updateSelectInput(session, "lead", selected = "none")
+  updateSelectInput(session, "jammer_penalty", selected = "none")
 })
 
 observeEvent(input$save, {
@@ -521,26 +574,33 @@ tidy_individual1 <- reactive({
     ) |> 
     select(
       jam_number,
-      jammer1,
+      jammer = jammer1,
       lead,
-      points1
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points1 - points2
     ) |> 
     group_by(
-      jammer1
+      jammer
     ) |> 
     reframe(
       n_jams = n(),
-      which_jams = list(jam_number),
-      n_jams_lead = sum(lead == team1),
-      n_points_list = list(points1),
-      n_points_sum = sum(points1)
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team1) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team1) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
     ) |> 
     mutate(
       team = team1,
-      n_points_jam = round(n_points_sum / n_jams, 0)
-    ) |> 
-    rename(
-      jammer = jammer1
+      
     )
 })
 
@@ -552,26 +612,32 @@ tidy_individual2 <- reactive({
     ) |> 
     select(
       jam_number,
-      jammer2,
+      jammer = jammer2,
       lead,
-      points2
+      points1,
+      points2,
+      jammer_penalty
+    ) |> 
+    mutate(
+      points_diff = points2 - points1
     ) |> 
     group_by(
-      jammer2
+      jammer
     ) |> 
     reframe(
       n_jams = n(),
-      which_jams = list(jam_number),
-      n_jams_lead = sum(lead == team2),
-      n_points_list = list(points2),
-      n_points_sum = sum(points2)
+      # which_jams = list(jam_number),
+      percent_jams_lead = round(
+        sum(lead == team2) / n_jams * 100
+      ),
+      percent_jams_penalty = round(
+        sum(jammer_penalty == team2) / n_jams * 100
+      ),
+      # n_points_list = list(points1),
+      n_points_sum = sum(points_diff)
     ) |> 
     mutate(
-      team = team2,
-      n_points_jam = round(n_points_sum / n_jams, 0)
-    ) |> 
-    rename(
-      jammer = jammer2
+      team = team2
     )
     
 })
@@ -579,30 +645,6 @@ tidy_individual2 <- reactive({
 # jammer points (hard)
 output$jammer_points1 <- renderPlot({
   p1 <- tidy_individual1() |> 
-    select(
-      team,
-      jammer,
-      n_jams,
-      n_jams_lead,
-      n_points_sum,
-      n_points_jam
-    ) |> 
-    tidyr::pivot_longer(
-      cols = matches("^n_"),
-      names_to = "what",
-      values_to = "value"
-    ) |> 
-    mutate(
-      what = factor(
-        what,
-        levels = c(
-          "n_jams",
-          "n_jams_lead",
-          "n_points_sum",
-          "n_points_jam"
-        )
-      )
-    ) |> 
     plot_jammer_stats(
       team_color = team_colors[1]
     )
@@ -614,30 +656,6 @@ output$jammer_points1 <- renderPlot({
 # jammer points (Oppo)
 output$jammer_points2 <- renderPlot({
   p2 <- tidy_individual2() |> 
-    select(
-      team,
-      jammer,
-      n_jams,
-      n_jams_lead,
-      n_points_sum,
-      n_points_jam
-    ) |> 
-    tidyr::pivot_longer(
-      cols = matches("^n_"),
-      names_to = "what",
-      values_to = "value"
-    ) |> 
-    mutate(
-      what = factor(
-        what,
-        levels = c(
-          "n_jams",
-          "n_jams_lead",
-          "n_points_sum",
-          "n_points_jam"
-        )
-      )
-    ) |> 
     plot_jammer_stats(
       team_color = team_colors[2]
     )
