@@ -270,17 +270,17 @@ checkboxGroupInput(
   inline = TRUE
 )
 
-# actionButton(
-#   "resetapp", 
-#   "Reset App", 
-#   icon("refresh"), 
-#   style="
-#     color: #fff; 
-#     background-color: #C13C37; 
-#     border-color: red; 
-#     width: 100%;
-#   "
-# )
+actionButton(
+  "resetapp",
+  "Reset App",
+  icon("refresh"),
+  style="
+    color: #fff;
+    background-color: #C13C37;
+    border-color: red;
+    width: 100%;
+  "
+)
 ```
 
 # {.toolbar}
