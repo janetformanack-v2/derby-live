@@ -135,6 +135,7 @@ library(dplyr)
 
 for (i in list.files("R", full.names = TRUE)) source(i)
 
+authenticate_googlesheets4()
 ```
 
 ```{r get_data}
@@ -179,6 +180,10 @@ if (!c("hard") %in% team_names) {
 ```{r}
 #| context: data
 
+# link to backend googlesheet to save data
+sheet_url_csv <- "https://docs.google.com/spreadsheets/d/1bzD30b7MsSsD6vVB_ZdjlMPuUb2xhWj6Qwy_qtIf6uM/pub?gid=0&single=true&output=csv"
+sheet_url <- "https://docs.google.com/spreadsheets/d/1bzD30b7MsSsD6vVB_ZdjlMPuUb2xhWj6Qwy_qtIf6uM/edit?gid=0#gid=0"
+
 # Get names of teams
 team1 <- "hard"
 team2 <- setdiff(team_names, team1)
@@ -217,19 +222,36 @@ players2 <- roster |>
 
 # Initialize reactiveValues to store the data
 data <- reactiveValues(
-  df = data.frame(
-    jammer1   = character(),
-    blockers1 = character(),
-    points1   = integer(),
-    jammer2   = character(),
-    blockers2 = character(),
-    points2   = integer(),
-    # jammer thingy
-    lead = character(),
-    jammer_penalty = character(),
-    stringsAsFactors = FALSE
-  )
+  df = tryCatch({
+    read.csv(
+      sheet_url_csv, 
+      header = TRUE,
+      colClasses = c(
+        "jammer1"        = "character",
+        "blockers1"      = "character",
+        "points1"        = "integer",
+        "jammer2"        = "character",
+        "blockers2"      = "character",
+        "points2"        = "integer",
+        "lead"           = "character",
+        "jammer_penalty" = "character"
+      )
+    )
+  }, error = function(e) {
+    data.frame(
+      jammer1        = character(),
+      blockers1      = character(),
+      points1        = integer(),
+      jammer2        = character(),
+      blockers2      = character(),
+      points2        = integer(),
+      lead           = character(),
+      jammer_penalty = character(),
+      stringsAsFactors = FALSE
+    )
+  })
 )
+
 ```
 
 ## {.sidebar}
@@ -247,7 +269,7 @@ checkboxGroupInput(
   "blockers1",
   glue::glue("Select Blockers ({team1})"),
   choices = players1,
-  selected = players1,
+  # selected = players1,
   inline = TRUE
 )
 
@@ -266,26 +288,55 @@ checkboxGroupInput(
   "blockers2",
   glue::glue("Select Blockers ({team2})"),
   choices = players2,
-  selected = players2,
+  # selected = players2,
   inline = TRUE
 )
-
-actionButton(
-  "resetapp",
-  "Reset App",
-  icon("refresh"),
-  style="
-    color: #fff;
-    background-color: #C13C37;
-    border-color: red;
-    width: 100%;
-  "
-)
 ```
+
+### WIFI connected ?
+
+```{r}
+selectInput(
+  "internet", 
+  NULL, 
+  choices = c("yes", "no"),
+  selected = "yes",
+  multiple = FALSE
+)
+
+tags$div(
+    class = "toolbar-content",
+    actionButton(
+      "random",
+      "Random Jam",
+      style="
+        color: #fff;
+        background-color: grey;
+        border-color: black;
+        width: 100%;
+      "
+    ),
+    actionButton(
+      "resetapp",
+      "Reset App",
+      icon("refresh"),
+      style="
+        color: #fff;
+        background-color: #C13C37;
+        border-color: red;
+        width: 100%;
+      "
+    )
+)
+
+
+```
+
 
 # {.toolbar}
 
 ```{r}
+
 tags$div(
   style = "
   background-color: #A2C5C9; 
@@ -452,6 +503,39 @@ conditionalPanel(
 )
 ```
 
+# Roster
+
+```{r}
+# Radio buttons to toggle between plots
+div(
+  radioButtons(
+    "roster_choice", 
+    "",
+    choices = c(
+      "HARD",
+      "Opponent"
+    ),
+    inline = TRUE
+  ),
+  style = "font-size:70%; margin-bottom: 15px !important;"
+)
+# Conditional panels to display the chosen plot
+div(
+  conditionalPanel(
+    condition = "input.roster_choice == 'HARD'",
+    tableOutput("roster_data1")
+  ),
+  style = "font-size:60%; margin-top: 1px !important;"
+)
+div(
+  conditionalPanel(
+    condition = "input.roster_choice == 'Opponent'",
+    tableOutput("roster_data2")
+  ),
+  style = "font-size:60%; margin-top: 1px !important"
+)
+```
+
 
 # Data
 
@@ -460,9 +544,11 @@ div(tableOutput("data_saved"), style = "font-size:40%")
 ```
 
 
+
 ```{r}
 #| context: server
 
+# reset defaults ----
 observeEvent(input$default, {
   updateSelectInput(session, "jammer1", selected = jammers1[1])
   updateCheckboxGroupInput(session, "blockers1", selected = character(0))
@@ -472,6 +558,49 @@ observeEvent(input$default, {
   updateSelectInput(session, "points2", selected = 0)
   updateSelectInput(session, "lead", selected = "none")
   updateSelectInput(session, "jammer_penalty", selected = "none")
+})
+
+# generate random jams ----
+observeEvent(input$random, {
+  
+  jammers <- c(
+    sample(jammers1, 1),
+    sample(players2, 1)
+  )
+  
+  blockers <- list(
+    sample(setdiff(players1, jammers[1]), 4),
+    sample(setdiff(players2, jammers[2]), 4)
+  )
+  
+  lead <- sample(c(team1, team2), 1)
+  
+  if(lead == team1) {
+    points <- c(
+      sample(c(0:8), 1),
+      sample(c(0:2), 1)
+    )
+  } else {
+    points <- c(
+      sample(c(0:2), 1),
+      sample(c(0:8), 1)
+    )
+  }
+  
+  if(sample(1:10, 1) > 8) {
+    penalty <- sample(c(team1, team2), 1)
+  } else {
+    penalty = "none"
+  }
+
+  updateSelectInput(session, "jammer1", selected = jammers[1])
+  updateCheckboxGroupInput(session, "blockers1", selected = blockers[[1]])
+  updateSelectInput(session, "jammer2", selected = jammers[2])
+  updateCheckboxGroupInput(session, "blockers2", selected = blockers[[2]])
+  updateSelectInput(session, "points1", selected = points[1])
+  updateSelectInput(session, "points2", selected = points[2])
+  updateSelectInput(session, "lead", selected = lead)
+  updateSelectInput(session, "jammer_penalty", selected = penalty)
 })
 
 observeEvent(input$save, {
@@ -489,12 +618,44 @@ observeEvent(input$save, {
     stringsAsFactors = FALSE
   )
   data$df <- bind_rows(data$df, new_row)
+  if (input$internet == "yes") {
+    try(
+      googlesheets4::sheet_write(
+        sheet = "derby-live-backend",
+        ss = sheet_url,
+        data = data$df
+      ),
+      silent = TRUE
+    )
+  }
+  # tryCatch(
+  #   run_with_timeout(
+  #     timeout = 150
+  #   ),
+  #   error = function(e) {}
+  # )
 })
 
 observeEvent(input$clear, {
   # Clear only the last saved row
   if (nrow(data$df) > 0) {
     data$df <- data$df[-nrow(data$df), ]
+    if (input$internet == "yes") {
+      try(
+        googlesheets4::sheet_write(
+          sheet = "derby-live-backend",
+          ss = sheet_url,
+          data = data$df
+        ),
+        silent = TRUE
+      )
+    }
+    # tryCatch(
+    #   run_with_timeout(
+    #     timeout = 150
+    #   ),
+    #   error = function(e) {}
+    # )
   }
 })
 
@@ -509,9 +670,49 @@ observeEvent(input$resetapp, {
     callbackR = function(x) {
       if (x) {
         data$df <- data$df[0, ]
+        if (input$internet == "yes") {
+          try(
+            googlesheets4::sheet_write(
+              sheet = "derby-live-backend",
+              ss = sheet_url,
+              data = data$df
+            ),
+            silent = TRUE
+          )
+        }
+        # tryCatch(
+        #   run_with_timeout(
+        #     timeout = 150
+        #   ),
+        #   error = function(e) {}
+        # )
       }
     }
   )
+})
+
+# generate random jams
+observeEvent(input$clear, {
+  # Clear only the last saved row
+  if (nrow(data$df) > 0) {
+    data$df <- data$df[-nrow(data$df), ]
+    if (input$internet == "yes") {
+      try(
+        googlesheets4::sheet_write(
+          sheet = "derby-live-backend",
+          ss = sheet_url,
+          data = data$df
+        ),
+        silent = TRUE
+      )
+    }
+    # tryCatch(
+    #   run_with_timeout(
+    #     timeout = 150
+    #   ),
+    #   error = function(e) {}
+    # )
+  }
 })
 
 output$data_saved <- renderTable({
@@ -525,6 +726,34 @@ output$data_saved <- renderTable({
       matches("^points"),
       matches("1$"),
       everything()
+    )
+})
+
+output$roster_data1 <- renderTable({
+  roster |> 
+    filter(
+      team == team1
+    ) |> 
+    select(
+      - jammer,
+      - team
+    ) |> 
+    arrange(
+      as.numeric(player_number)
+    )
+})
+
+output$roster_data2 <- renderTable({
+  roster |> 
+    filter(
+      team == team2
+    ) |> 
+    select(
+      - jammer,
+      - team
+    ) |> 
+    arrange(
+      as.numeric(player_number)
     )
 })
 
